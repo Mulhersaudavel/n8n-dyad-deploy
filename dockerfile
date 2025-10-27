@@ -1,5 +1,5 @@
 # Usa imagem base do n8n com Debian moderno
-FROM n8nio/n8n:1.72.0-bookworm
+https://hub.docker.com/r/n8nio/n8n/tags
 USER root
 
 # Instala Python e dependências necessárias
