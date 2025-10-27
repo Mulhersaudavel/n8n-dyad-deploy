@@ -1,6 +1,5 @@
 # Usa imagem base do n8n com Debian moderno
-FROM n8nio/n8n:1.72.0-debian
-
+FROM n8nio/n8n:latest-bookworm
 USER root
 
 # Instala Python e dependências necessárias
