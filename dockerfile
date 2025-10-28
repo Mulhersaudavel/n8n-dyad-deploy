@@ -1,21 +1,41 @@
-# Usa a imagem oficial mais recente do n8n (base Debian moderna)
-FROM n8nio/n8n:latest
+# Imagem base: n8n oficial
+FROM docker.n8n.io/n8nio/n8n:latest
 
-# Troca para o usuário root para instalar dependências do sistema
 USER root
-
-# Atualiza pacotes e instala dependências úteis (Python + libs para automação web)
 RUN apt-get update && apt-get install -y \
-    python3 python3-pip curl wget unzip chromium-driver \
-    && pip3 install --no-cache-dir selenium beautifulsoup4 requests pandas \
-    && apt-get clean \
+    python3 python3-pip git curl chromium-driver \
     && rm -rf /var/lib/apt/lists/*
 
-# Retorna para o usuário padrão do n8n
-USER node
+# Instala pacotes úteis para automação e raspagem
+RUN pip3 install \
+    selenium \
+    beautifulsoup4 \
+    requests \
+    pandas \
+    google-api-python-client \
+    openai \
+    playwright
 
-# Define a porta padrão do n8n
+# Instala Dyad globalmente
+RUN npm install -g dyad
+
+# Instala cliente (placeholder) da Evolution API se houver npm package
+# (substitua por pacote correto ou deixe para instalar via workflow se necessário)
+# RUN npm install -g @evolutionapi/evolution-api
+
+# Variáveis de ambiente do n8n (não coloque segredos aqui em produção)
+ENV N8N_BASIC_AUTH_ACTIVE=true
+ENV N8N_BASIC_AUTH_USER=admin
+ENV N8N_BASIC_AUTH_PASSWORD=ChangeMe123
+ENV N8N_HOST=0.0.0.0
+ENV N8N_PORT=5678
+
+# Variáveis placeholders para Evolution / Dyad
+ENV EVOLUTION_API_KEY=changeme
+ENV EVOLUTION_API_URL=https://your-evolution-instance
+
 EXPOSE 5678
 
-# Comando padrão para iniciar o n8n
-CMD ["n8n", "start"]
+# Inicializa Dyad (se necessário) e n8n
+CMD dyad start & n8n start
+
