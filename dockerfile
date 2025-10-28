@@ -1,13 +1,12 @@
-FROM debian:bookworm-slim AS builder
-RUN apt-get update && apt-get install -y python3 python3-pip git curl chromium-driver && rm -rf /var/lib/apt/lists/*
-# copie os binários/arquivos necessários para /tmp/artifacts
-RUN mkdir -p /artifacts && cp /usr/bin/chromedriver /artifacts/ && cp -r /usr/lib/python3 /artifacts/
-
-FROM docker.n8n.io/n8nio/n8n:latest
+FROM docker.n8n.io/n8nio/n8n:latest AS probe
 USER root
-COPY --from=builder /artifacts/chromedriver /usr/bin/chromedriver
-COPY --from=builder /artifacts/python3 /usr/local/python3
-ENV PATH="/usr/local/python3/bin:${PATH}"
+RUN echo "=== /etc/os-release ===" && cat /etc/os-release || true
+RUN echo "=== package managers ===" && (which apt-get || true) && (which apk || true) && (which dnf || true) && (which microdnf || true)
+RUN echo "=== ls /usr/bin (sample) ===" && ls -la /usr/bin | head -n 50
+RUN echo "=== env vars ===" && env | sort
+# força falha para garantir que logs do probe apareçam e build pare aqui
+RUN false
+
 # continue com sua configuração do n8n
 
 
