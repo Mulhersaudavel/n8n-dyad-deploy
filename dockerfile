@@ -1,5 +1,10 @@
 # Imagem base: n8n oficial
+FROM debian:bookworm-slim AS builder
+RUN apt-get update && apt-get install -y chromium-driver
+
 FROM docker.n8n.io/n8nio/n8n:latest
+COPY --from=builder /usr/bin/chromedriver /usr/bin/chromedriver
+
 
 USER root
 RUN apt-get update && apt-get install -y \
