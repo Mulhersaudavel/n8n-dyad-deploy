@@ -1,9 +1,15 @@
-# Imagem base: n8n oficial
 FROM debian:bookworm-slim AS builder
-RUN apt-get update && apt-get install -y chromium-driver
+RUN apt-get update && apt-get install -y python3 python3-pip git curl chromium-driver && rm -rf /var/lib/apt/lists/*
+# copie os binários/arquivos necessários para /tmp/artifacts
+RUN mkdir -p /artifacts && cp /usr/bin/chromedriver /artifacts/ && cp -r /usr/lib/python3 /artifacts/
 
 FROM docker.n8n.io/n8nio/n8n:latest
-COPY --from=builder /usr/bin/chromedriver /usr/bin/chromedriver
+USER root
+COPY --from=builder /artifacts/chromedriver /usr/bin/chromedriver
+COPY --from=builder /artifacts/python3 /usr/local/python3
+ENV PATH="/usr/local/python3/bin:${PATH}"
+# continue com sua configuração do n8n
+
 
 
 USER root
